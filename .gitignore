@@ -1,0 +1,68 @@
+# -------------------------------
+# Node.js
+# -------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log
+
+# -------------------------------
+# Vite / CRA / Build Tools
+# -------------------------------
+dist/
+build/
+.cache/
+.vite/
+out/
+
+# -------------------------------
+# OS and Editor Specific
+# -------------------------------
+.DS_Store
+Thumbs.db
+
+# macOS system files
+.AppleDouble
+.LSOverride
+
+# Windows system files
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Linux
+*~
+
+# -------------------------------
+# VSCode
+# -------------------------------
+.vscode/
+.history/
+
+# -------------------------------
+# Environment Variables
+# -------------------------------
+.env
+.env.local
+.env.*.local
+
+# -------------------------------
+# Logs & Reports
+# -------------------------------
+logs/
+*.log
+*.tsbuildinfo
+
+# -------------------------------
+# Git
+# -------------------------------
+*.orig
+*.swp
+
+# -------------------------------
+# Images/Uploads (if needed)
+# -------------------------------
+public/uploads/
+*.bak
