@@ -24,12 +24,10 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {isAuthenticated ? (
             <>
-              <Link to="/jobs" className="text-gray-600 hover:text-gray-800">
-                Features
+              <Link to="/dashboard" className="text-gray-600 hover:text-gray-800">
+                Go to Dashboard
               </Link>
-              <Link to="/blog" className="text-gray-600 hover:text-gray-800">
-                Testimonials
-              </Link>
+             
 
               {/* Profile Dropdown */}
               <div className="relative">
@@ -54,12 +52,6 @@ const Navbar = () => {
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                     >
                       My Profile
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                    >
-                      Settings
                     </Link>
                     <button
                       onClick={handleLogout}
