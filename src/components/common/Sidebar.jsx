@@ -1,9 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import Logo from "../../assets/react.svg";
-import dashboard from "../../assets/Dashboard.svg";
-// eslint-disable-next-line
-import admin from "../../assets/react.svg";
 import { Home, Send, FileText, User, Users, Bell } from "lucide-react";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -47,7 +43,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <div className="items-center justify-between ps-12 pt-5.5 lg:pt-4.5">
         <NavLink to="/" className="flex">
           {/* <img src={Logo} alt="Logo" width={"70%"} /> */}
-          <h1 className="text-2xl font-semibold"> Khaata Maintain</h1>
+          <h1 className="text-2xl font-semibold"> Khata Book</h1>
         </NavLink>
 
         <button

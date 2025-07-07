@@ -20,6 +20,7 @@ const Customer = () => {
     name: '',
     phone: '',
     address: '',
+    email:'',
     gst: '',
     firm: '',
   });
@@ -35,8 +36,8 @@ const Customer = () => {
   );
 
   const customerBills = {
-    1: [{ date: '2025-07-06', status: 'Paid' }],
-    2: [{ date: '2025-07-05', status: 'Due' }],
+    1: [{ billNo:'B001',date: '2025-07-06', status: 'Paid' }],
+    2: [{ billNo:'B002', date: '2025-07-05', status: 'Due' },{billNo:'B003', date: '2025-07-05', status: 'Paid' }],
     3: [],
     4: [],
     5: [],
@@ -114,7 +115,7 @@ const Customer = () => {
             onSubmit={handleCreateCustomer}
             className="bg-white p-6 rounded-xl shadow-md space-y-6 max-w-3xl mx-auto"
           >
-            {['name', 'phone', 'address', 'gst', 'firm'].map((field) => (
+            {['name', 'phone', 'address', 'gst', 'firm','email'].map((field) => (
               <div key={field}>
                 <label className="block font-medium mb-1 capitalize">
                   {field === 'gst' ? 'GST Number' : field.replace(/^\w/, c => c.toUpperCase())}
@@ -164,6 +165,7 @@ const Customer = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-gray-100 p-4 rounded">
               <p><strong>Name:</strong> {selectedCustomer.name}</p>
               <p><strong>Phone:</strong> {selectedCustomer.phone}</p>
+               <p><strong>Customer Id:</strong> {selectedCustomer.id}</p>
               <p><strong>Address:</strong> {selectedCustomer.address}</p>
               <p><strong>Firm:</strong> {selectedCustomer.firm}</p>
               <p><strong>GST:</strong> {selectedCustomer.gst || 'N/A'}</p>
@@ -173,6 +175,7 @@ const Customer = () => {
               <table className="min-w-full text-sm border border-gray-300">
                 <thead className="bg-gray-200">
                   <tr>
+                     <th className="px-4 py-2 border">Bill No</th>
                     <th className="px-4 py-2 border">Date</th>
                     <th className="px-4 py-2 border">Status</th>
                   </tr>
@@ -180,6 +183,7 @@ const Customer = () => {
                 <tbody>
                   {(customerBills[selectedCustomer.id] || []).map((bill, idx) => (
                     <tr key={idx}>
+                       <td className="px-4 py-2 border">{bill.billNo}</td>
                       <td className="px-4 py-2 border">{bill.date}</td>
                       <td className={`px-4 py-2 border ${bill.status === 'Paid' ? 'text-green-600' : 'text-red-600'}`}>
                         {bill.status}
@@ -203,6 +207,7 @@ const Customer = () => {
             <table className="min-w-full text-sm text-left border border-gray-200">
               <thead className="bg-gray-100">
                 <tr>
+                  <th className='px-4 py-2 border'>Customer Id</th>
                   <th className="px-4 py-2 border">Name</th>
                   <th className="px-4 py-2 border">Phone</th>
                   <th className="px-4 py-2 border">Firm</th>
@@ -215,6 +220,7 @@ const Customer = () => {
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSelectCustomer(cust)}
                   >
+                    <td className="px-4 py-2 border">{cust.name}</td>
                     <td className="px-4 py-2 border">{cust.name}</td>
                     <td className="px-4 py-2 border">{cust.phone}</td>
                     <td className="px-4 py-2 border">{cust.firm}</td>
