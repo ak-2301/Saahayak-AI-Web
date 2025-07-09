@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa"; // Import dropdown icon
 import profilePic from '../../assets/profile_Pic.jpg';
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 

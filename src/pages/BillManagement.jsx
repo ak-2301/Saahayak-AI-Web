@@ -1,106 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import DefaultLayout from "../components/common/DefaultLayout";
+import { toast } from "react-toastify";
 
 const BillManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     customerId: "",
-    customer: "",
+    image: "",
     date: "",
-    status: "Paid",
-    bills: [],
+    totalAmount: "",
+    status: "PAID",
   });
+
+  const [bills, setBills] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
-
-  const customers = [
-    { id: "CUST001", name: "Shubham Kirana Store" },
-    { id: "CUST002", name: "Ankit Traders" },
-    { id: "CUST003", name: "Suman Store" },
-  ];
-
-  const [transactions, setTransactions] = useState([
-    {
-      customerId: "CUST001",
-      customer: "Shubham Kirana Store",
-      date: "06-07-2025",
-      status: "Paid",
-    },
-    {
-      customerId: "CUST002",
-      customer: "Ankit Traders",
-      date: "05-07-2025",
-      status: "Due",
-    },
-    {
-      customerId: "CUST002",
-      customer: "Ankit Traders",
-      date: "04-07-2025",
-      status: "Due",
-    },
-    {
-      customerId: "CUST003",
-      customer: "Suman Store",
-      date: "03-07-2025",
-      status: "Paid",
-    },
-    {
-      customerId: "CUST001",
-      customer: "Shubham Kirana Store",
-      date: "02-07-2025",
-      status: "Paid",
-    },
-    {
-      customerId: "CUST003",
-      customer: "Suman Store",
-      date: "01-07-2025",
-      status: "Due",
-    },
-  ]);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
-  const paginatedTransactions = transactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
 
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, bills: Array.from(e.target.files) });
+  const fetchBills = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/bills");
+      setBills(response.data);
+      setLoading(false);
+    } catch (err) {
+      toast.error("Failed to fetch bills");
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchBills();
+  }, []);
 
   const validate = () => {
     const newErrors = {};
     if (!formData.customerId) newErrors.customerId = "Customer ID is required";
-    if (!formData.customer) newErrors.customer = "Customer name is required";
     if (!formData.date) newErrors.date = "Date is required";
-    if (!formData.bills.length) newErrors.bills = "Please upload at least one bill";
+    if (!formData.totalAmount || isNaN(formData.totalAmount))
+      newErrors.totalAmount = "Valid total amount is required";
+    if (!formData.image.trim()) newErrors.image = "Bill image URL is required";
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
 
-    const newTransaction = {
-      customerId: formData.customerId,
-      customer: formData.customer,
-      date: formData.date,
-      status: formData.status,
-    };
+    try {
+      await axios.post("http://localhost:8080/api/bills", {
+        ...formData,
+        totalAmount: parseFloat(formData.totalAmount),
+      });
 
-    setTransactions([newTransaction, ...transactions]);
-    setShowForm(false);
-    setFormData({
-      customerId: "",
-      customer: "",
-      date: "",
-      status: "Paid",
-      bills: [],
-    });
+      toast.success("Bill uploaded successfully!");
+      setShowForm(false);
+      fetchBills();
+      setFormData({
+        customerId: "",
+        image: "",
+        date: "",
+        totalAmount: "",
+        status: "PAID",
+      });
+    } catch (error) {
+      toast.error("Failed to upload bill");
+      console.error(error);
+    }
   };
+
+  const paginatedBills = bills.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+  const totalPages = Math.ceil(bills.length / itemsPerPage);
 
   return (
     <DefaultLayout>
@@ -111,65 +87,37 @@ const BillManagement = () => {
             onClick={() => setShowForm((prev) => !prev)}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
           >
-            {showForm ? "View Transactions" : "Upload Bill"}
+            {showForm ? "View Bills" : "Upload Bill"}
           </button>
         </div>
 
+        {/* Upload Form */}
         {showForm ? (
           <form
             onSubmit={handleSubmit}
             className="bg-white p-6 rounded-xl shadow-md space-y-6 max-w-3xl mx-auto"
           >
-            <div>
-              <label className="block font-medium mb-1">Customer ID</label>
-              <input
-                type="text"
-                className="w-full border rounded px-3 py-2"
-                value={formData.customerId}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerId: e.target.value })
-                }
-              />
-              {errors.customerId && (
-                <p className="text-red-500 text-sm mt-1">{errors.customerId}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">Customer Name</label>
-              <select
-                className="w-full border rounded px-3 py-2"
-                value={formData.customer}
-                onChange={(e) =>
-                  setFormData({ ...formData, customer: e.target.value })
-                }
-              >
-                <option value="">Select customer</option>
-                {customers.map((cust) => (
-                  <option key={cust.id} value={cust.name}>
-                    {cust.name}
-                  </option>
-                ))}
-              </select>
-              {errors.customer && (
-                <p className="text-red-500 text-sm mt-1">{errors.customer}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">Date</label>
-              <input
-                type="date"
-                className="w-full border rounded px-3 py-2"
-                value={formData.date}
-                onChange={(e) =>
-                  setFormData({ ...formData, date: e.target.value })
-                }
-              />
-              {errors.date && (
-                <p className="text-red-500 text-sm mt-1">{errors.date}</p>
-              )}
-            </div>
+            {[
+              { label: "Customer ID", key: "customerId" },
+              { label: "Image URL", key: "image" },
+              { label: "Date", key: "date", type: "date" },
+              { label: "Total Amount", key: "totalAmount", type: "number" },
+            ].map(({ label, key, type = "text" }) => (
+              <div key={key}>
+                <label className="block font-medium mb-1">{label}</label>
+                <input
+                  type={type}
+                  className="w-full border rounded px-3 py-2"
+                  value={formData[key]}
+                  onChange={(e) =>
+                    setFormData({ ...formData, [key]: e.target.value })
+                  }
+                />
+                {errors[key] && (
+                  <p className="text-red-500 text-sm mt-1">{errors[key]}</p>
+                )}
+              </div>
+            ))}
 
             <div>
               <label className="block font-medium mb-1">Status</label>
@@ -180,36 +128,9 @@ const BillManagement = () => {
                   setFormData({ ...formData, status: e.target.value })
                 }
               >
-                <option value="Paid">Paid</option>
-                <option value="Due">Due</option>
+                <option value="PAID">PAID</option>
+                <option value="DUE">DUE</option>
               </select>
-            </div>
-
-            <div>
-              <label className="block font-medium mb-1">
-                Upload Bill(s) (PDF/Image)
-              </label>
-              <div className="flex justify-center items-center bg-gray-500 p-4 rounded">
-                <input
-                  type="file"
-                  multiple
-                  accept="application/pdf,image/*"
-                  onChange={handleFileChange}
-                  className="w-full max-w-md text-white"
-                />
-              </div>
-              {errors.bills && (
-                <p className="text-red-500 text-sm mt-1">{errors.bills}</p>
-              )}
-              {formData.bills.length > 0 && (
-                <div className="mt-2 bg-gray-100 rounded p-3">
-                  <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
-                    {formData.bills.map((file, idx) => (
-                      <li key={idx}>{file.name}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
 
             <div className="text-right">
@@ -221,42 +142,56 @@ const BillManagement = () => {
               </button>
             </div>
           </form>
+        ) : loading ? (
+          <p>Loading bills...</p>
         ) : (
           <div className="bg-white shadow rounded-xl p-4 overflow-auto">
-            <h2 className="text-xl font-semibold mb-4">Recent Transactions</h2>
+            <h2 className="text-xl font-semibold mb-4">Recent Bills</h2>
             <table className="min-w-full text-sm text-left border border-gray-200">
               <thead className="bg-gray-100">
                 <tr>
+                  <th className="px-4 py-2 border">Bill ID</th>
                   <th className="px-4 py-2 border">Customer ID</th>
-                  <th className="px-4 py-2 border">Customer</th>
                   <th className="px-4 py-2 border">Date</th>
+                  <th className="px-4 py-2 border">Amount</th>
                   <th className="px-4 py-2 border">Status</th>
+                  <th className="px-4 py-2 border">Image</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedTransactions.map((tx, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-2 border">{tx.customerId}</td>
-                    <td className="px-4 py-2 border">{tx.customer}</td>
-                    <td className="px-4 py-2 border">{tx.date}</td>
+                {paginatedBills.map((bill) => (
+                  <tr key={bill.billId}>
+                    <td className="px-4 py-2 border">{bill.billId}</td>
+                    <td className="px-4 py-2 border">{bill.customerId}</td>
+                    <td className="px-4 py-2 border">{bill.date}</td>
+                    <td className="px-4 py-2 border">₹{bill.totalAmount}</td>
                     <td
-                      className={`px-4 py-2 border ${
-                        tx.status === "Paid"
+                      className={`px-4 py-2 border font-medium ${bill.status === "PAID"
                           ? "text-green-600"
                           : "text-red-600"
-                      }`}
+                        }`}
                     >
-                      {tx.status}
+                      {bill.status}
+                    </td>
+                    <td className="px-4 py-2 border">
+                      <a
+                        href={bill.image}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        View
+                      </a>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* Pagination controls */}
+            {/* Pagination */}
             <div className="flex justify-end mt-4 space-x-2">
               <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
                 className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
               >
@@ -266,18 +201,17 @@ const BillManagement = () => {
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 rounded ${
-                    currentPage === i + 1
+                  className={`px-3 py-1 rounded ${currentPage === i + 1
                       ? "bg-blue-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
-                  }`}
+                    }`}
                 >
                   {i + 1}
                 </button>
               ))}
               <button
                 onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  setCurrentPage((p) => Math.min(p + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
                 className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
