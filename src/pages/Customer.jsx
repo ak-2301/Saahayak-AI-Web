@@ -1,96 +1,124 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import DefaultLayout from '../components/common/DefaultLayout';
+import { toast } from 'react-toastify';
 
 const Customer = () => {
-  const initialCustomers = Array.from({ length: 12 }, (_, i) => ({
-    id: i + 1,
-    name: `Customer ${i + 1}`,
-    phone: `98765432${(i + 1).toString().padStart(2, '0')}`,
-    address: `Address ${i + 1}`,
-    gst: `07ABCDE${(i + 1).toString().padStart(4, '0')}F1Z5`,
-    firm: `Firm ${i + 1}`,
-  }));
-
-  const [customers, setCustomers] = useState(initialCustomers);
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [customerBills, setCustomerBills] = useState([]);
+  const [billLoading, setBillLoading] = useState(false);
+  const [error, setError] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [viewingCustomer, setViewingCustomer] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const itemsPerPage = 10;
 
   const [newCustomer, setNewCustomer] = useState({
-    name: '',
-    phone: '',
+    customerName: '',
+    phoneNo: '',
+    email: '',
     address: '',
-    email:'',
-    gst: '',
-    firm: '',
+    firmName: '',
+    gstno: '',
   });
 
   const [errors, setErrors] = useState({});
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  // get all customer List 
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/customer');
+      setCustomers(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to fetch customers.');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
+
+  // View All bills for a particular customer
+  const handleViewCustomer = async (customer) => {
+    setSelectedCustomer(customer);
+    setViewingCustomer(true);
+    setBillLoading(true);
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/bills/customer/${customer.customerId}`
+      );
+      setCustomerBills(res.data);
+    } catch (err) {
+      toast.error("Failed to fetch bills for customer");
+      setCustomerBills([]);
+    }
+    setBillLoading(false);
+  };
+
   const totalPages = Math.ceil(customers.length / itemsPerPage);
   const paginatedCustomers = customers.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
-  const customerBills = {
-    1: [{ billNo:'B001',date: '2025-07-06', status: 'Paid' }],
-    2: [{ billNo:'B002', date: '2025-07-05', status: 'Due' },{billNo:'B003', date: '2025-07-05', status: 'Paid' }],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: [],
-    10: [],
-    11: [],
-    12: [],
-  };
-
-  const handleSelectCustomer = (customer) => {
-    setSelectedCustomer(customer);
-    setViewingCustomer(true);
-  };
-
   const handleChange = (e) => {
     setNewCustomer({ ...newCustomer, [e.target.name]: e.target.value });
   };
 
-  const handleCreateCustomer = (e) => {
+  // Create a customer API Call 
+  const handleCreateCustomer = async (e) => {
     e.preventDefault();
     const newErrors = {};
 
-    if (!newCustomer.name.trim()) newErrors.name = 'Customer name is required';
-    if (!newCustomer.phone.match(/^\d{10}$/))
-      newErrors.phone = 'Enter a valid 10-digit phone';
+    if (!newCustomer.customerName.trim())
+      newErrors.customerName = 'Customer name is required';
+    if (!/^\d{10}$/.test(newCustomer.phoneNo))
+      newErrors.phoneNo = 'Enter a valid 10-digit number';
     if (!newCustomer.address.trim())
       newErrors.address = 'Address is required';
-    if (
-      newCustomer.gst &&
-      !newCustomer.gst.match(/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/)
-    ) {
-      newErrors.gst = 'Invalid GST Number format';
+    if (!newCustomer.firmName.trim())
+      newErrors.firmName = 'Firm name is required';
+    if (!newCustomer.gstno.trim())
+      newErrors.gstno = 'GST number is required';
+    if (!newCustomer.email.trim())
+      newErrors.email = 'Email is required';
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/customer', {
+        customerName: newCustomer.customerName,
+        phoneNo: newCustomer.phoneNo,
+        email: newCustomer.email,
+        gstno: newCustomer.gstno,
+        firmName: newCustomer.firmName,
+        address: newCustomer.address,
+      });
+
+      toast.success('Customer created successfully!');
+      setShowForm(false);
+      fetchCustomers();
+      setNewCustomer({
+        customerName: '',
+        phoneNo: '',
+        email: '',
+        gstno: '',
+        firmName: '',
+        address: '',
+      });
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      toast.error('Something went wrong while creating customer');
     }
-    if (!newCustomer.firm.trim()) newErrors.firm = 'Firm name is required';
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    const newEntry = {
-      ...newCustomer,
-      id: customers.length + 1,
-    };
-
-    setCustomers([...customers, newEntry]);
-    setNewCustomer({ name: '', phone: '', address: '', gst: '', firm: '' });
-    setErrors({});
-    setShowForm(false);
   };
+
+
 
   return (
     <DefaultLayout>
@@ -100,8 +128,8 @@ const Customer = () => {
           {!viewingCustomer && (
             <button
               onClick={() => {
-                setShowForm((prev) => !prev);
-                setSelectedCustomer(null);
+                setShowForm(!showForm);
+                setViewingCustomer(false);
               }}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
             >
@@ -110,41 +138,44 @@ const Customer = () => {
           )}
         </div>
 
-        {showForm ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : showForm ? (
           <form
             onSubmit={handleCreateCustomer}
             className="bg-white p-6 rounded-xl shadow-md space-y-6 max-w-3xl mx-auto"
           >
-            {['name', 'phone', 'address', 'gst', 'firm','email'].map((field) => (
-              <div key={field}>
-                <label className="block font-medium mb-1 capitalize">
-                  {field === 'gst' ? 'GST Number' : field.replace(/^\w/, c => c.toUpperCase())}
-                </label>
-                {field === 'address' ? (
-                  <textarea
-                    name={field}
-                    value={newCustomer[field]}
-                    onChange={handleChange}
-                    className="w-full border px-3 py-2 rounded"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    name={field}
-                    value={newCustomer[field]}
-                    onChange={handleChange}
-                    className="w-full border px-3 py-2 rounded"
-                  />
+            {[
+              ['customerName', 'Customer Name'],
+              ['phoneNo', 'Phone Number'],
+              ['email', 'Email'],
+              ['address', 'Address'],
+              ['firmName', 'Firm Name'],
+              ['gstno', 'GST Number'],
+            ].map(([key, label]) => (
+              <div key={key}>
+                <label className="block font-medium mb-1">{label}</label>
+                <input
+                  type="text"
+                  name={key}
+                  value={newCustomer[key]}
+                  onChange={handleChange}
+                  className="w-full border px-3 py-2 rounded"
+                />
+                {errors[key] && (
+                  <p className="text-red-500 text-sm">{errors[key]}</p>
                 )}
-                {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
               </div>
             ))}
+
             <div className="text-right">
               <button
                 type="submit"
                 className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
               >
-                Submit
+                Create
               </button>
             </div>
           </form>
@@ -159,47 +190,63 @@ const Customer = () => {
                   setSelectedCustomer(null);
                 }}
               >
-                Back to Customer List
+                Back to List
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm bg-gray-100 p-4 rounded">
-              <p><strong>Name:</strong> {selectedCustomer.name}</p>
-              <p><strong>Phone:</strong> {selectedCustomer.phone}</p>
-               <p><strong>Customer Id:</strong> {selectedCustomer.id}</p>
-              <p><strong>Address:</strong> {selectedCustomer.address}</p>
-              <p><strong>Firm:</strong> {selectedCustomer.firm}</p>
-              <p><strong>GST:</strong> {selectedCustomer.gst || 'N/A'}</p>
-            </div>
+            <p><strong>Customer Id:</strong> {selectedCustomer.customerId}</p>
+            <p><strong>Name:</strong> {selectedCustomer.customerName}</p>
+            <p><strong>Firm:</strong> {selectedCustomer.firmName}</p>
+            <p><strong>Address:</strong> {selectedCustomer.address}</p>
+            <p><strong>GST No:</strong> {selectedCustomer.gstno}</p>
+
             <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-2">Bills</h4>
-              <table className="min-w-full text-sm border border-gray-300">
-                <thead className="bg-gray-200">
-                  <tr>
-                     <th className="px-4 py-2 border">Bill No</th>
-                    <th className="px-4 py-2 border">Date</th>
-                    <th className="px-4 py-2 border">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(customerBills[selectedCustomer.id] || []).map((bill, idx) => (
-                    <tr key={idx}>
-                       <td className="px-4 py-2 border">{bill.billNo}</td>
-                      <td className="px-4 py-2 border">{bill.date}</td>
-                      <td className={`px-4 py-2 border ${bill.status === 'Paid' ? 'text-green-600' : 'text-red-600'}`}>
-                        {bill.status}
-                      </td>
-                    </tr>
-                  ))}
-                  {(!customerBills[selectedCustomer.id] || customerBills[selectedCustomer.id].length === 0) && (
+              <h3 className="text-lg font-medium mb-2">Bills</h3>
+              {billLoading ? (
+                <p>Loading bills...</p>
+              ) : customerBills.length === 0 ? (
+                <p>No bills found for this customer.</p>
+              ) : (
+                <table className="min-w-full text-sm text-left border border-gray-200 mt-2">
+                  <thead className="bg-gray-100">
                     <tr>
-                      <td colSpan="2" className="px-4 py-2 border text-center text-gray-500">
-                        No bills found for this customer.
-                      </td>
+                      <th className="px-4 py-2 border">Bill ID</th>
+                      <th className="px-4 py-2 border">Date</th>
+                      <th className="px-4 py-2 border">Amount</th>
+                      <th className="px-4 py-2 border">Status</th>
+                      <th className="px-4 py-2 border">Image</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {customerBills.map((bill) => (
+                      <tr key={bill.billId}>
+                        <td className="px-4 py-2 border">{bill.billId}</td>
+                        <td className="px-4 py-2 border">{bill.date}</td>
+                        <td className="px-4 py-2 border">₹{bill.totalAmount}</td>
+                        <td
+                          className={`px-4 py-2 border font-medium ${bill.status === "PAID"
+                              ? "text-green-600"
+                              : "text-red-600"
+                            }`}
+                        >
+                          {bill.status}
+                        </td>
+                        <td className="px-4 py-2 border">
+                          <a
+                            href={bill.image}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            View
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
+
           </div>
         ) : (
           <div className="bg-white shadow rounded-xl p-4 overflow-auto">
@@ -207,7 +254,7 @@ const Customer = () => {
             <table className="min-w-full text-sm text-left border border-gray-200">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className='px-4 py-2 border'>Customer Id</th>
+                  <th className="px-4 py-2 border">ID</th>
                   <th className="px-4 py-2 border">Name</th>
                   <th className="px-4 py-2 border">Phone</th>
                   <th className="px-4 py-2 border">Firm</th>
@@ -216,41 +263,45 @@ const Customer = () => {
               <tbody>
                 {paginatedCustomers.map((cust) => (
                   <tr
-                    key={cust.id}
+                    key={cust.customerId}
                     className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleSelectCustomer(cust)}
+                    onClick={() => handleViewCustomer(cust)}
                   >
-                    <td className="px-4 py-2 border">{cust.name}</td>
-                    <td className="px-4 py-2 border">{cust.name}</td>
-                    <td className="px-4 py-2 border">{cust.phone}</td>
-                    <td className="px-4 py-2 border">{cust.firm}</td>
+                    <td className="px-4 py-2 border">{cust.customerId}</td>
+                    <td className="px-4 py-2 border">{cust.customerName}</td>
+                    <td className="px-4 py-2 border">{cust.phoneNo}</td>
+                    <td className="px-4 py-2 border">{cust.firmName}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* Pagination controls */}
             <div className="flex justify-end mt-4 space-x-2">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
                 disabled={currentPage === 1}
+                className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
               >
                 Prev
               </button>
               {[...Array(totalPages)].map((_, i) => (
                 <button
-                  key={i + 1}
+                  key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`px-3 py-1 rounded ${currentPage === i + 1
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
                 >
                   {i + 1}
                 </button>
               ))}
               <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
               >
                 Next
               </button>
