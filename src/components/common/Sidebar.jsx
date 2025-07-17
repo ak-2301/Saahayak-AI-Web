@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, Send, FileText, User, Users, Bell } from "lucide-react";
+import { Home, Send, FileText, User, Users, Bell , Calendar,Settings} from "lucide-react";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
@@ -43,7 +43,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       <div className="items-center justify-between ps-12 pt-5.5 lg:pt-4.5">
         <NavLink to="/" className="flex">
           {/* <img src={Logo} alt="Logo" width={"70%"} /> */}
-          <h1 className="text-2xl font-semibold"> Khata Book</h1>
+          <h1 className="text-2xl font-semibold">Saahayak</h1>
         </NavLink>
 
         <button
@@ -76,32 +76,42 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   Dashboard
                 </NavLink>
                 <NavLink
-                  to="/sales"
+                  to="/saahayak-ai"
                   className={`group relative flex items-center gap-4.5 mb-2  rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-purple-100  ${
                     pathname.includes("sales") && "bg-purple-200"
                   }`}
                 >
                   
                 <Send/>
-                Sales Report
+                Saahayak AI
+                </NavLink>
+                 <NavLink
+                  to="/schedule"
+                  className={`group relative flex items-center gap-4.5 mb-2  rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-purple-100  ${
+                    pathname.includes("schedule") && "bg-purple-200"
+                  }`}
+                >
+                  
+                <Calendar/>
+                Schedule Manager
                 </NavLink>
                 <NavLink
-                  to="/customers"
+                  to="/content-analyze"
                   className={`group relative flex items-center gap-4.5 mb-2  rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-purple-100  ${
                     pathname.includes("customers") && "bg-purple-200"
                   }`}
                 >
-                  <User />
-                  Customers Management
+                  <FileText/>
+                  Content Analyzer
                 </NavLink>
                 <NavLink
-                  to="/bills"
+                  to="/settings"
                   className={`group relative flex items-center gap-4.5 mb-2  rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-purple-100  ${
                     pathname.includes("bills") && "bg-purple-200"
                   }`}
                 >
-                  <Users />
-                  Bills Management
+                  <Settings/>
+                  Settings
                 </NavLink>
               </li>
             </ul>

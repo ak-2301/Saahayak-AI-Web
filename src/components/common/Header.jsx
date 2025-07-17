@@ -1,43 +1,24 @@
 import React, { useEffect, useState } from "react";
-//import { useUser } from '../UserContext'
-//import { supabase } from '../../../supabaseClient'
 import { useNavigate } from 'react-router-dom'
-
+import { Link } from "react-router-dom";
 
 const Header = (props) => {
 
-    const { email, setEmail } = useState("Ankit");
-    const [loading, setLoading] = useState(true)
-    const navigate = useNavigate()
+  const { email, setEmail } = useState("Ankit");
+  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     const fetchEmailIfNotSet = async () => {
-    //         if (!email) {
-    //             const { data: { user }, error } = await supabase.auth.getUser()
-    //             if (user?.email) {
-    //                 setEmail(user.email)
-    //             }
-    //         }
-    //         setLoading(false)
-    //     }
-
-    //     fetchEmailIfNotSet()
-    // }, [])
-
-    const handleLogout = async () => {
-        // await supabase.auth.signOut()
-        setEmail(null)
-        navigate('/')
-    }
-
-    // if (loading) return <p>Loading...</p>
+  const handleLogout = async () => {
+    setEmail(null)
+    navigate('/')
+  }
   return (
     <header
       className="sticky top-0 z-999 flex w-full bg-gray-100 border-b border-gray-100 drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none"
     >
       <div className="flex flex-grow items-center justify-between px-4 py-4 md:px-6 2xl:px-11 shadow-2">
         <div className="flex items-center ">
-            <button
+          <button
             aria-controls="sidebar"
             onClick={(e) => {
               e.stopPropagation();
@@ -48,31 +29,26 @@ const Header = (props) => {
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="du-block absolute right-0 h-full w-full">
                 <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!w-full delay-300'
-                  }`}
+                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!w-full delay-300'
+                    }`}
                 ></span>
                 <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && 'delay-400 !w-full'
-                  }`}
+                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && 'delay-400 !w-full'
+                    }`}
                 ></span>
                 <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!w-full delay-500'
-                  }`}
+                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!w-full delay-500'
+                    }`}
                 ></span>
               </span>
               <span className="absolute right-0 h-full w-full rotate-45">
                 <span
-                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!h-0 !delay-[0]'
-                  }`}
+                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!h-0 !delay-[0]'
+                    }`}
                 ></span>
                 <span
-                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && '!h-0 !delay-200'
-                  }`}
+                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${!props.sidebarOpen && '!h-0 !delay-200'
+                    }`}
                 ></span>
               </span>
             </span>
@@ -82,13 +58,13 @@ const Header = (props) => {
               <span className="block text-sm font-medium text-black dark:text-black">
                 <p className="text-base pl-2">Welcome, {email ? email : 'Guest'}!</p>
               </span>
-            </span> 
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-3 2xsm:gap-7">
-            <button onClick={handleLogout} className="mt-0 px-4 py-2 bg-red-500 text-white rounded">
-                        Logout
-                    </button>
+          <Link to="/" onClick={handleLogout} className="text-red-500 hover:underline">
+            Logout
+          </Link>
         </div>
       </div>
     </header>
