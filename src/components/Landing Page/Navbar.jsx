@@ -17,7 +17,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center px-4">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-gray-800">
-          Khata Book
+          Saahayak
         </Link>
 
         {/* Navigation Links */}
@@ -69,7 +69,7 @@ const Navbar = () => {
                 Login
               </Link>
               <Link
-                to="/register"
+                to="/signup"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
                 Sign Up
