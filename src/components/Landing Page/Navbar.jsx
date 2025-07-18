@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaChevronDown } from "react-icons/fa"; // Import dropdown icon
 import profilePic from '../../assets/profile_Pic.jpg';
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -69,7 +69,7 @@ const Navbar = () => {
                 Login
               </Link>
               <Link
-                to="/register"
+                to="/signup"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
               >
                 Sign Up

@@ -8,6 +8,8 @@ import Settings from "./pages/Settings";
 import ContentAnalyze from "./pages/ContentAnalyze";
 import SaahayakAI from "./pages/SaahayakAI";
 import ScheduleManager from "./pages/ScheduleManager";
+import Login from "./pages/AuthPages/Login";
+import SignUp from "./pages/AuthPages/SignUp";
 
 
 
@@ -17,8 +19,8 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        {/* <Route path="/signup" element={<Signup />} />
-      <Route path="/login" element={<Login />} /> */}
+        <Route path="/signup" element={<SignUp />} />
+      <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/saahayak-ai" element={<SaahayakAI />} />

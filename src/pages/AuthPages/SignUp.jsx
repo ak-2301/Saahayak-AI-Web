@@ -1,103 +1,195 @@
-// import { supabase } from '../../supabaseClient'
-// import { useState } from 'react'
-// import "../styles/SignUp.css"
+import React from "react";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import InputForm from "../../components/InputForm";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+const SignUp = () => {
+  const [name, setName] = useState("");
+  const [phoneno, setPhoneNo] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-// export default function Signup() {
-//   const [email, setEmail] = useState('')
-//   const [username, setUsername] = useState('')
-//   const [loading, setLoading] = useState(false)
-//   const [message, setMessage] = useState('')
+  //redux state
+//   const { loading } = useSelector((state) => state.alerts);
 
-//   const apiUrl = import.meta.env.VITE_API_URL;
+//   //hooks
+//   const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-//   const handleMagicLinkSignup = async () => {
-//     setLoading(true)
-//     const { data, error } = await supabase.auth.signInWithOtp({
-//         email,
-//         options: {
-//         emailRedirectTo: `${window.location.origin}/oauth-callback`,
-//         },
-//     })
+  //form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-//     if (error) {
-//         setMessage(error.message)
-//     } else {
-//         setMessage('Check your email for the login link.')
-//     }
+    if (!name || !phoneno || !email || !password) {
+      toast.error("Please fill all the fields!");
+      return;
+    }
 
-//     setLoading(false)
-//     }
+    try {
+      // Simulate registration success
+      toast.success("Registered successfully!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000); // Wait for 2 seconds before redirect
+    } catch (error) {
+      toast.error("Something went wrong!");
+      console.error(error);
+    }
+  };
 
-//   const handleGoogleSignup = async () => {
-//     await supabase.auth.signOut();
-//     await supabase.auth.signInWithOAuth({
-//       provider: 'google',
-//       options: {
-//         redirectTo: window.location.origin + '/oauth-callback',
-//       },
-//     })
-//   }
 
-//   const handleGitHubSignup = async () => {
-//     await supabase.auth.signOut();
-//     await supabase.auth.signInWithOAuth({
-//       provider: 'github',
-//       options: {
-//         redirectTo: window.location.origin + '/oauth-callback',
-//       },
-//     })
-//   }
+  return (
 
-//   return (
-//   <div className="signup-container">
-//     <h1>Ready to Reignite Your Ideas?</h1>
-//     <p style={{fontSize: '18px', fontWeight:'400', color:'grey', marginBottom:'50px'}}>Create your account and unlock AI-powered tools to revive your unfinished projects.</p>
+        <>
+          <ToastContainer position="top-center" autoClose={1500} />
+          <section className="bg-white">
+            <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
+              <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
+                <img
+                  alt="Night"
+                  src="https://images.unsplash.com/photo-1617195737496-bc30194e3a19?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
+                  className="absolute inset-0 h-full w-full object-cover opacity-80"
+                />
 
-//     <div className='input-box'>
+                <div className="hidden lg:relative lg:block lg:p-12">
+                  <a className="block text-white" href="/">
+                    <span className="sr-only">Home</span>
+                    <svg
+                      className="h-8 sm:h-10"
+                      viewBox="0 0 28 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M0.41 10.3847C1.14777 7.4194 2.85643 4.7861 5.2639 2.90424C7.6714 1.02234 10.6393 0 13.695 0C16.7507 0 19.7186 1.02234 22.1261 2.90424C24.5336 4.7861 26.2422 7.4194 26.98 10.3847H25.78C23.7557 10.3549 21.7729 10.9599 20.11 12.1147C20.014 12.1842 19.9138 12.2477 19.81 12.3047H19.67C19.5662 12.2477 19.466 12.1842 19.37 12.1147C17.6924 10.9866 15.7166 10.3841 13.695 10.3841C11.6734 10.3841 9.6976 10.9866 8.02 12.1147C7.924 12.1842 7.8238 12.2477 7.72 12.3047H7.58C7.4762 12.2477 7.376 12.1842 7.28 12.1147C5.6171 10.9599 3.6343 10.3549 1.61 10.3847H0.41ZM23.62 16.6547C24.236 16.175 24.9995 15.924 25.78 15.9447H27.39V12.7347H25.78C24.4052 12.7181 23.0619 13.146 21.95 13.9547C21.3243 14.416 20.5674 14.6649 19.79 14.6649C19.0126 14.6649 18.2557 14.416 17.63 13.9547C16.4899 13.1611 15.1341 12.7356 13.745 12.7356C12.3559 12.7356 11.0001 13.1611 9.86 13.9547C9.2343 14.416 8.4774 14.6649 7.7 14.6649C6.9226 14.6649 6.1657 14.416 5.54 13.9547C4.4144 13.1356 3.0518 12.7072 1.66 12.7347H0V15.9447H1.61C2.39051 15.924 3.154 16.175 3.77 16.6547C4.908 17.4489 6.2623 17.8747 7.65 17.8747C9.0377 17.8747 10.392 17.4489 11.53 16.6547C12.1468 16.1765 12.9097 15.9257 13.69 15.9447C14.4708 15.9223 15.2348 16.1735 15.85 16.6547C16.9901 17.4484 18.3459 17.8738 19.735 17.8738C21.1241 17.8738 22.4799 17.4484 23.62 16.6547ZM23.62 22.3947C24.236 21.915 24.9995 21.664 25.78 21.6847H27.39V18.4747H25.78C24.4052 18.4581 23.0619 18.886 21.95 19.6947C21.3243 20.156 20.5674 20.4049 19.79 20.4049C19.0126 20.4049 18.2557 20.156 17.63 19.6947C16.4899 18.9011 15.1341 18.4757 13.745 18.4757C12.3559 18.4757 11.0001 18.9011 9.86 19.6947C9.2343 20.156 8.4774 20.4049 7.7 20.4049C6.9226 20.4049 6.1657 20.156 5.54 19.6947C4.4144 18.8757 3.0518 18.4472 1.66 18.4747H0V21.6847H1.61C2.39051 21.664 3.154 21.915 3.77 22.3947C4.908 23.1889 6.2623 23.6147 7.65 23.6147C9.0377 23.6147 10.392 23.1889 11.53 22.3947C12.1468 21.9165 12.9097 21.6657 13.69 21.6847C14.4708 21.6623 15.2348 21.9135 15.85 22.3947C16.9901 23.1884 18.3459 23.6138 19.735 23.6138C21.1241 23.6138 22.4799 23.1884 23.62 22.3947Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </a>
 
-//     <input
-//       className="signup-input"
-//       type="email"
-//       placeholder="Provide your email address"
-//       value={email}
-//       onChange={(e) => setEmail(e.target.value)}
-//     />
-//     </div>
-// <div className='input-box'>
-//     <input
-//       className="signup-input"
-//       type="text"
-//       placeholder="Set up a username"
-//       value={username}
-//       onChange={(e) => setUsername(e.target.value)}
-//     />
-// </div>
-//     <button className="signup-button" onClick={handleMagicLinkSignup} disabled={loading}>
-//       Sign up 
-//     </button>
-//     <div className='oauth-buttons'>
-//     <button className="signup-button-google" onClick={handleGoogleSignup}>
-    
-//       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
-//     <path fill="#ffc107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917" />
-//     <path fill="#ff3d00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691" />
-//     <path fill="#4caf50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.9 11.9 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44" />
-//     <path fill="#1976d2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917" />
-//   </svg>
-//       <p>Continue with Google</p>
-//     </button>
+                  <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">
+                    Welcome to Saahayak
+                  </h2>
 
-//     <button className="signup-button-git" onClick={handleGitHubSignup}>
-//       <svg xmlns="http://www.w3.org/2000/svg" width="24.58" height="24" viewBox="0 0 256 250">
-//     <path fill="#161614" d="M128.001 0C57.317 0 0 57.307 0 128.001c0 56.554 36.676 104.535 87.535 121.46c6.397 1.185 8.746-2.777 8.746-6.158c0-3.052-.12-13.135-.174-23.83c-35.61 7.742-43.124-15.103-43.124-15.103c-5.823-14.795-14.213-18.73-14.213-18.73c-11.613-7.944.876-7.78.876-7.78c12.853.902 19.621 13.19 19.621 13.19c11.417 19.568 29.945 13.911 37.249 10.64c1.149-8.272 4.466-13.92 8.127-17.116c-28.431-3.236-58.318-14.212-58.318-63.258c0-13.975 5-25.394 13.188-34.358c-1.329-3.224-5.71-16.242 1.24-33.874c0 0 10.749-3.44 35.21 13.121c10.21-2.836 21.16-4.258 32.038-4.307c10.878.049 21.837 1.47 32.066 4.307c24.431-16.56 35.165-13.12 35.165-13.12c6.967 17.63 2.584 30.65 1.255 33.873c8.207 8.964 13.173 20.383 13.173 34.358c0 49.163-29.944 59.988-58.447 63.157c4.591 3.972 8.682 11.762 8.682 23.704c0 17.126-.148 30.91-.148 35.126c0 3.407 2.304 7.398 8.792 6.14C219.37 232.5 256 184.537 256 128.002C256 57.307 198.691 0 128.001 0m-80.06 182.34c-.282.636-1.283.827-2.194.39c-.929-.417-1.45-1.284-1.15-1.922c.276-.655 1.279-.838 2.205-.399c.93.418 1.46 1.293 1.139 1.931m6.296 5.618c-.61.566-1.804.303-2.614-.591c-.837-.892-.994-2.086-.375-2.66c.63-.566 1.787-.301 2.626.591c.838.903 1 2.088.363 2.66m4.32 7.188c-.785.545-2.067.034-2.86-1.104c-.784-1.138-.784-2.503.017-3.05c.795-.547 2.058-.055 2.861 1.075c.782 1.157.782 2.522-.019 3.08m7.304 8.325c-.701.774-2.196.566-3.29-.49c-1.119-1.032-1.43-2.496-.726-3.27c.71-.776 2.213-.558 3.315.49c1.11 1.03 1.45 2.505.701 3.27m9.442 2.81c-.31 1.003-1.75 1.459-3.199 1.033c-1.448-.439-2.395-1.613-2.103-2.626c.301-1.01 1.747-1.484 3.207-1.028c1.446.436 2.396 1.602 2.095 2.622m10.744 1.193c.036 1.055-1.193 1.93-2.715 1.95c-1.53.034-2.769-.82-2.786-1.86c0-1.065 1.202-1.932 2.733-1.958c1.522-.03 2.768.818 2.768 1.868m10.555-.405c.182 1.03-.875 2.088-2.387 2.37c-1.485.271-2.861-.365-3.05-1.386c-.184-1.056.893-2.114 2.376-2.387c1.514-.263 2.868.356 3.061 1.403" />
-//   </svg>
-//       <p>Continue with GitHub</p>
-//     </button>
-//     </div>
-    
+                  <p className="mt-4 leading-relaxed text-white/90">
+                   Empowering Teachers in Multi-Grade Classrooms
+                  </p>
+                </div>
+              </section>
 
-//     <p className="signup-message">{message}</p>
-//   </div>
-// )
+              <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
+                <div className="max-w-xl lg:max-w-3xl">
+                  <div className="relative -mt-16 block lg:hidden">
+                    <a
+                      className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white text-blue-600 sm:h-20 sm:w-20"
+                      href="/"
+                    >
+                      <span className="sr-only">Home</span>
+                      <svg
+                        className="h-8 sm:h-10"
+                        viewBox="0 0 28 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M0.41 10.3847C1.14777 7.4194 2.85643 4.7861 5.2639 2.90424C7.6714 1.02234 10.6393 0 13.695 0C16.7507 0 19.7186 1.02234 22.1261 2.90424C24.5336 4.7861 26.2422 7.4194 26.98 10.3847H25.78C23.7557 10.3549 21.7729 10.9599 20.11 12.1147C20.014 12.1842 19.9138 12.2477 19.81 12.3047H19.67C19.5662 12.2477 19.466 12.1842 19.37 12.1147C17.6924 10.9866 15.7166 10.3841 13.695 10.3841C11.6734 10.3841 9.6976 10.9866 8.02 12.1147C7.924 12.1842 7.8238 12.2477 7.72 12.3047H7.58C7.4762 12.2477 7.376 12.1842 7.28 12.1147C5.6171 10.9599 3.6343 10.3549 1.61 10.3847H0.41ZM23.62 16.6547C24.236 16.175 24.9995 15.924 25.78 15.9447H27.39V12.7347H25.78C24.4052 12.7181 23.0619 13.146 21.95 13.9547C21.3243 14.416 20.5674 14.6649 19.79 14.6649C19.0126 14.6649 18.2557 14.416 17.63 13.9547C16.4899 13.1611 15.1341 12.7356 13.745 12.7356C12.3559 12.7356 11.0001 13.1611 9.86 13.9547C9.2343 14.416 8.4774 14.6649 7.7 14.6649C6.9226 14.6649 6.1657 14.416 5.54 13.9547C4.4144 13.1356 3.0518 12.7072 1.66 12.7347H0V15.9447H1.61C2.39051 15.924 3.154 16.175 3.77 16.6547C4.908 17.4489 6.2623 17.8747 7.65 17.8747C9.0377 17.8747 10.392 17.4489 11.53 16.6547C12.1468 16.1765 12.9097 15.9257 13.69 15.9447C14.4708 15.9223 15.2348 16.1735 15.85 16.6547C16.9901 17.4484 18.3459 17.8738 19.735 17.8738C21.1241 17.8738 22.4799 17.4484 23.62 16.6547ZM23.62 22.3947C24.236 21.915 24.9995 21.664 25.78 21.6847H27.39V18.4747H25.78C24.4052 18.4581 23.0619 18.886 21.95 19.6947C21.3243 20.156 20.5674 20.4049 19.79 20.4049C19.0126 20.4049 18.2557 20.156 17.63 19.6947C16.4899 18.9011 15.1341 18.4757 13.745 18.4757C12.3559 18.4757 11.0001 18.9011 9.86 19.6947C9.2343 20.156 8.4774 20.4049 7.7 20.4049C6.9226 20.4049 6.1657 20.156 5.54 19.6947C4.4144 18.8757 3.0518 18.4472 1.66 18.4747H0V21.6847H1.61C2.39051 21.664 3.154 21.915 3.77 22.3947C4.908 23.1889 6.2623 23.6147 7.65 23.6147C9.0377 23.6147 10.392 23.1889 11.53 22.3947C12.1468 21.9165 12.9097 21.6657 13.69 21.6847C14.4708 21.6623 15.2348 21.9135 15.85 22.3947C16.9901 23.1884 18.3459 23.6138 19.735 23.6138C21.1241 23.6138 22.4799 23.1884 23.62 22.3947Z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </a>
 
-// }
+                    <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
+                      Welcome to Saahayak
+                    </h1>
+
+                    <p className="mt-4 leading-relaxed text-gray-500">
+                      Empowering Teachers in Multi-Grade Classrooms
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <h1 className="text-2xl">Register Here !!</h1>
+                  </div>
+                  <form
+                    className="mt-8 grid grid-cols-6 gap-6"
+                    onSubmit={handleSubmit}
+                  >
+                    <InputForm
+                      htmlFor="name"
+                      labelText={" Name"}
+                      type={"text"}
+                      value={name}
+                      handleChange={(e) => setName(e.target.value)}
+                      name="name"
+                      placeholder="Enter your name"
+                    />
+
+                   
+                    <InputForm
+                      htmlFor="email"
+                      labelText={"Email"}
+                      type={"email"}
+                      value={email}
+                      handleChange={(e) => setEmail(e.target.value)}
+                      name="email"
+                       placeholder="Enter your Email"
+                    />
+                     <InputForm
+                      htmlFor="phoneno"
+                      labelText={"Phone No"}
+                      type={"text"}
+                      value={phoneno}
+                      handleChange={(e) => setPhoneNo(e.target.value)}
+                      name="phoneno"
+                       placeholder="Enter your phone Number"
+                    />
+                    <InputForm
+                      htmlFor="password"
+                      labelText={"Password"}
+                      type={"password"}
+                      value={password}
+                      handleChange={(e) => setPassword(e.target.value)}
+                      name="password"
+                       placeholder="Enter your password"
+                    />
+
+                    <div className="col-span-6">
+                      <p className="text-sm text-gray-500">
+                        By creating an account, you agree to our
+                        <a href="#" className="text-gray-700 underline">
+                          {" "}
+                          terms and conditions{" "}
+                        </a>
+                        and
+                        <a href="#" className="text-gray-700 underline">
+                          privacy policy
+                        </a>
+                        .
+                      </p>
+                    </div>
+
+                    <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
+                      <button
+                        type="submit"
+                        className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white"
+                      >
+                        Create an account
+                      </button>
+
+                      <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                        Already have an account?
+                        <Link to="/login" className="text-gray-700 underline">
+                          Log in
+                        </Link>
+                        .
+                      </p>
+                    </div>
+                  </form>
+                </div>
+              </main>
+            </div>
+          </section>
+    </>
+  );
+};
+export default SignUp;
